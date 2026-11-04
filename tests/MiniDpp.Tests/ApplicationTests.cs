@@ -1,5 +1,3 @@
-using Microsoft.AspNetCore.Mvc.Testing;
-
 namespace MiniDpp.Tests;
 
 public sealed class ApplicationTests
@@ -7,7 +5,7 @@ public sealed class ApplicationTests
     [Fact]
     public async Task HomePage_IsAvailableInTurkish()
     {
-        await using var factory = new WebApplicationFactory<Program>();
+        await using var factory = new DppFactory();
         using var client = factory.CreateClient();
         var response = await client.GetAsync("/");
         response.EnsureSuccessStatusCode();

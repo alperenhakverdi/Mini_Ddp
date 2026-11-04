@@ -4,7 +4,22 @@ ESG Next işe alım değerlendirmesi için denim ürünlerinin CSV verilerinden 
 
 ## Durum
 
-Geliştirme planı tamamlandı. Henüz çalıştırılabilir uygulama bulunmuyor. Kurulum, çalıştırma ve kullanım adımları uygulama geliştirildikçe eklenecek.
+Proje iskeleti oluşturuldu; Türkçe ana sayfa ve ilk entegrasyon testi çalışıyor. CSV içe aktarma ve ürün pasaportları sonraki aşamalarda eklenecek.
+
+## Yerel çalıştırma
+
+.NET 10 SDK gereklidir. Proje kökünde:
+
+```powershell
+dotnet restore MiniDpp.sln
+dotnet run --project src/MiniDpp --launch-profile http
+```
+
+Uygulama: http://localhost:5000
+
+Testler: `dotnet test MiniDpp.sln`
+
+Aşamalar, tamamlanma ölçütleri, testler ve Türkçe commit noktaları için [geliştirme yol haritasına](./YOL_HARITASI.md) bakın.
 
 ## Planlanan kapsam
 

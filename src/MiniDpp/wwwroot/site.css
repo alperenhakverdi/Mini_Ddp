@@ -1,0 +1,8 @@
+:root { font-family: system-ui, sans-serif; color: #163047; background: #f4f6f8; }
+body { margin: 0; }
+header, main, footer { max-width: 960px; margin: auto; padding: 24px; }
+header { display: flex; justify-content: space-between; gap: 20px; border-bottom: 1px solid #ccd6df; }
+header a { font-size: 1.4rem; font-weight: 750; }
+a { color: #145a86; }
+main { min-height: 65vh; }
+footer { color: #526777; font-size: .9rem; }

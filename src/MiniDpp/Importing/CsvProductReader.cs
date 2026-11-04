@@ -19,13 +19,15 @@ public sealed class CsvProductReader
     public async Task<CsvDocument> ReadAsync(Stream stream, CancellationToken cancellationToken = default)
     {
         var rows = new List<CsvProductRow>();
+        CsvMalformedRecord? malformed = null;
         using var reader = new StreamReader(stream, new UTF8Encoding(false, true), detectEncodingFromByteOrderMarks: false,
             bufferSize: 4096, leaveOpen: true);
         using var csv = CsvReader.Create(reader, new CsvReaderOptions
         {
             HasHeader = false, SkipEmptyLines = false, Separator = ',', TrackLineNumbers = true,
-            AllowLineBreaksInQuotes = true, MalformedData = CsvMalformedDataHandling.Throw,
-            FieldCountMismatch = CsvFieldCountHandling.Allow, IncludeValuesInExceptions = false
+            AllowLineBreaksInQuotes = true, MalformedData = CsvMalformedDataHandling.Recover,
+            FieldCountMismatch = CsvFieldCountHandling.Allow, IncludeValuesInExceptions = false,
+            OnMalformedRecord = record => malformed = record
         });
 
         var startLine = 1;
@@ -33,6 +35,7 @@ public sealed class CsvProductReader
         try
         {
             if (!await csv.ReadAsync(cancellationToken)) return new(rows, false, "CSV dosyası boş.");
+            if (malformed is not null) return new([], false, "CSV başlığında tırnak yapısı bozuk.");
             var header = Enumerable.Range(0, csv.FieldCount).Select(index => csv.GetString(index).Trim()).ToArray();
             header[0] = header[0].TrimStart('\uFEFF');
             if (header.Length != Headers.Length || header.Distinct(StringComparer.Ordinal).Count() != Headers.Length
@@ -43,8 +46,18 @@ public sealed class CsvProductReader
             while (true)
             {
                 cancellationToken.ThrowIfCancellationRequested();
+                malformed = null;
                 if (!await csv.ReadAsync(cancellationToken)) break;
                 startLine = checked((int)csv.LineNumber);
+                if (malformed is { } badRecord)
+                {
+                    var unrecoverable = badRecord.Reason == CsvMalformedReason.UnterminatedQuote;
+                    rows.Add(new(startLine, null, [new(startLine, "csv", unrecoverable
+                        ? "CSV tırnak yapısı bozuk. Sonraki kayıt sınırları belirlenemediği için okuma durduruldu."
+                        : "CSV tırnak yapısı bozuk. Satır kaydedilmedi.")]));
+                    if (unrecoverable) return new(rows, false);
+                    continue;
+                }
                 var fields = Enumerable.Range(0, csv.FieldCount).Select(csv.GetString).ToArray();
                 if (fields.Length == 1 && string.IsNullOrWhiteSpace(fields[0])) continue;
                 if (fields.Length != Headers.Length)

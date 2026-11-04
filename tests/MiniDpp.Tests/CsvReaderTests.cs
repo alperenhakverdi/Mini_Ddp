@@ -96,6 +96,17 @@ public sealed class CsvReaderTests
     }
 
     [Fact]
+    public async Task MalformedQuotingWithKnownBoundary_DoesNotPreventFollowingValidRow()
+    {
+        var document = await Read(Header + "\n08690000000029,De\"nim,B01,99,1,Denizli,0\n" + Valid);
+        Assert.True(document.Completed);
+        Assert.Null(document.Rows[0].Product);
+        Assert.Equal("csv", Assert.Single(document.Rows[0].Errors).Alan);
+        Assert.NotNull(document.Rows[1].Product);
+        Assert.Equal(3, document.Rows[1].Satir);
+    }
+
+    [Fact]
     public async Task UnclosedQuote_StopsReadingWithExplicitError()
     {
         var document = await Read(Header + "\n" + Valid + "\n08690000000029,\"unfinished,B01,99,1,Denizli,0");

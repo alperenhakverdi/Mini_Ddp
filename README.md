@@ -4,7 +4,7 @@ ESG Next işe alım değerlendirmesi için denim ürünlerini CSV'den doğrulay�
 
 ## Durum
 
-Temel işlevler tamamlandı. Ürün güncelleme ve sürüm geçmişi de teslimat kapsamındadır; yol haritasının 8. aşamasında tamamlanacaktır.
+Temel işlevler ve bonus ürün sürüm geçmişi tamamlandı. Aynı GTIN'in değişen bilgileri CSV ile güncellenir; önceki sürümün bütün alanları sürüm numarası ve UTC tarihleriyle saklanır.
 
 ## Yerel çalıştırma
 
@@ -19,7 +19,7 @@ Uygulama: http://localhost:5000. Durdurmak için `Ctrl+C` kullanın. İlk açıl
 
 ## CSV içe aktarma
 
-Ana sayfada CSV seçip **Dosyayı içe aktar** düğmesine basın. Sonuçta kaydedilen, değişmeyen ve reddedilen kayıt sayıları; satır/alan bazında hatalar ve başarılı ürünlerin bağlantıları gösterilir. Kayıtlı ürün tablosunu güncellemek için **Ürün listesini yenile** bağlantısını kullanın.
+Ana sayfada CSV seçip **Dosyayı içe aktar** düğmesine basın. Sonuçta kaydedilen, güncellenen, değişmeyen ve reddedilen kayıt sayıları; satır/alan bazında hatalar ve başarılı ürünlerin bağlantıları gösterilir. Kayıtlı ürün tablosunu güncellemek için **Ürün listesini yenile** bağlantısını kullanın.
 
 API üzerinden, proje kökünde:
 
@@ -62,10 +62,33 @@ Kısmi başarılı dosyalar HTTP `200` döndürür; `hatalar` ve `reddedilen` al
 | Yetkili HTML | http://localhost:5000/dpp/08690000000012?rol=yetkili |
 | Yetkili JSON-LD | http://localhost:5000/dpp/08690000000012.jsonld?rol=yetkili |
 | QR PNG | http://localhost:5000/dpp/08690000000012/qr.png |
+| Sürüm geçmişi | http://localhost:5000/dpp/08690000000012/history |
+| Yetkili sürüm geçmişi | http://localhost:5000/dpp/08690000000012/history?rol=yetkili |
 
 Önce CSV yüklenmelidir; bulunamayan GTIN'ler için `404` döner. JSON-LD içerik türü `application/ld+json`, yapı [schema.org/Product](https://schema.org/Product) temellidir. Batch, üretim yeri ve elyaf oranları `additionalProperty` ile verilir.
 
-Tüketici HTML ve JSON-LD yanıtlarında karbon alanı hiç bulunmaz. Yalnızca tam `rol=yetkili` değeri karbonu gösterir. Bu parametre **demo amaçlıdır; kimlik doğrulama veya gerçek erişim kontrolü sağlamaz**. QR kod her zaman tüketici HTML adresine gider ve PNG istek anında üretilir.
+Tüketici HTML, JSON-LD ve sürüm geçmişinde karbon alanı hiç bulunmaz. Yalnızca tam `rol=yetkili` değeri karbonu gösterir. Bu parametre **demo amaçlıdır; kimlik doğrulama veya gerçek erişim kontrolü sağlamaz**. QR kod her zaman tüketici HTML adresine gider ve PNG istek anında üretilir.
+
+## Güncelleme ve sürüm geçmişi
+
+İlk kayıt sürüm **1** olarak oluşturulur. Aynı GTIN ile farklı geçerli bilgiler yüklendiğinde güncel ürün değiştirilir; önceki halinin GTIN, model, batch, elyaf oranları, üretim yeri, karbon, sürüm numarası ve tarihleri `ProductVersions` tablosunda saklanır. Güncel ürünün oluşturulma tarihi korunur; sürüm numarası artar ve güncellenme tarihi yenilenir. Arşivde hem eski sürümün güncellenme hem de yerini yeni sürüme bıraktığı arşivlenme zamanı bulunur; tarihler UTC'dir.
+
+Güncelleme, arşivleme ve varsa yeni ilişkili kayıtlar tek transaction içindedir. Başarısız işlem bunların tamamını geri alır. Güncel verilerle birebir aynı yükleme sürüm üretmez veya tarihi değiştirmez. Eski bir CSV farklı bilgiler içeriyorsa yeniden yüklenmesi de yeni bir sürüm oluşturur. Aynı dosyada tekrar eden GTIN'ler satır sırasıyla işlenir.
+
+Örnek güncelleme için aşağıdaki içeriği UTF-8 bir CSV olarak kaydedip yükleyin; önce orijinal örneği yüklemiş olun:
+
+```csv
+gtin,model_adi,batch_no,elyaf_pamuk_yuzde,elyaf_elastan_yuzde,uretim_yeri,karbon_kg_co2e
+08690000000012,Slim Denim 501,B2027-01,98,2,Denizli,10.7
+```
+
+Sonuç: `guncellenen: 1`, güncel sürüm 2 ve geçmişte 12.4 karbon değerini taşıyan sürüm 1. Aynı güncelleme dosyası tekrar yüklendiğinde `degismeyen: 1` döner. Karbon değerleri yalnızca yetkili görünümde gösterilir. GTIN kimliktir; başka GTIN ile yükleme mevcut ürünün kimliğini değiştirmez, yeni ürün oluşturur.
+
+Hazır örnek: [examples/urun_guncelleme.csv](./examples/urun_guncelleme.csv).
+
+```powershell
+curl.exe -F "file=@examples/urun_guncelleme.csv" http://localhost:5000/api/imports
+```
 
 ## Tasarım varsayımları ve yapılandırma
 
@@ -91,7 +114,7 @@ dotnet test MiniDpp.sln --configuration Release
 dotnet build MiniDpp.sln --configuration Release
 ```
 
-Testler geçici SQLite dosyaları kullanır; demo veritabanını değiştirmez. Doğrulama kuralları, satır numaraları, kısmi başarı, tekrar yükleme, transaction rollback, kalıcılık ve karbon görünürlüğü test edilir. PNG, StbImageSharp ve ZXing.Net ile çözümlenerek gerçek QR hedefi doğrulanır. QR üretimi QRCoder ile yapılır; System.Drawing kullanılmaz.
+Testler geçici SQLite dosyaları kullanır; demo veritabanını değiştirmez. Doğrulama kuralları, satır numaraları, kısmi başarı, tekrar yükleme, transaction rollback, kalıcılık, karbon görünürlüğü ve sürüm geçmişi test edilir. Mevcut veritabanının yeni migration ile veri kaybetmeden yükselmesi ve arşivleme hatasında güncellemenin geri alınması da doğrulanır. PNG, StbImageSharp ve ZXing.Net ile çözümlenerek gerçek QR hedefi doğrulanır. QR üretimi QRCoder ile yapılır; System.Drawing kullanılmaz.
 
 Uygulama migration'ları kendisi uygular. Yeni migration geliştirmek gerektiğinde sabitlenmiş yerel aracı yükleyin:
 

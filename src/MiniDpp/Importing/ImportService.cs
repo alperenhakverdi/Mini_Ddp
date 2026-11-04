@@ -9,6 +9,7 @@ public sealed class ImportReport
 {
     public int Toplam { get; set; }
     public int Kaydedilen { get; set; }
+    public int Guncellenen { get; set; }
     public int Degismeyen { get; set; }
     public int Reddedilen { get; set; }
     public bool Tamamlandi { get; set; }
@@ -38,9 +39,10 @@ public sealed class ImportService(CsvProductReader reader, ProductStore store, D
             {
                 var outcome = await store.SaveAsync(row.Product, cancellationToken);
                 if (outcome == SaveOutcome.Created) report.Kaydedilen++;
+                else if (outcome == SaveOutcome.Updated) report.Guncellenen++;
                 else report.Degismeyen++;
                 report.Urunler.Add(new(row.Satir, row.Product.Gtin,
-                    outcome == SaveOutcome.Created ? "kaydedildi" : "degismedi",
+                    outcome switch { SaveOutcome.Created => "kaydedildi", SaveOutcome.Updated => "guncellendi", _ => "degismedi" },
                     links.Html(row.Product.Gtin), links.JsonLd(row.Product.Gtin), links.Qr(row.Product.Gtin)));
             }
             catch (ProductConflictException exception)

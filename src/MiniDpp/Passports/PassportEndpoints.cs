@@ -29,7 +29,9 @@ public static class PassportEndpoints
             Property("batch_no", "Batch numarası", passport.BatchNumber),
             Property("uretim_yeri", "Üretim yeri", passport.ProductionLocation),
             Property("elyaf_pamuk_yuzde", "Pamuk oranı", passport.CottonPercentage, "%"),
-            Property("elyaf_elastan_yuzde", "Elastan oranı", passport.ElastanePercentage, "%")
+            Property("elyaf_elastan_yuzde", "Elastan oranı", passport.ElastanePercentage, "%"),
+            Property("surum", "Sürüm", passport.Version),
+            Property("guncelleme_tarihi", "Güncellenme tarihi", passport.UpdatedAt.ToString("O"))
         };
         if (passport.CarbonKgCo2e is { } carbon)
             properties.Add(Property("karbon_kg_co2e", "Karbon ayak izi", carbon, "kg CO2e"));

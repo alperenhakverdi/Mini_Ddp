@@ -44,7 +44,7 @@ form.addEventListener("submit", async event => {
         const report = await response.json();
         if (!response.ok) throw new Error(report.dosyaHatasi || report.title || "Dosya yüklenemedi.");
 
-        document.getElementById("result-summary").textContent = `${report.toplam} kayıt işlendi: ${report.kaydedilen} kaydedildi, ${report.degismeyen} değişmedi, ${report.reddedilen} reddedildi.`;
+        document.getElementById("result-summary").textContent = `${report.toplam} kayıt işlendi: ${report.kaydedilen} kaydedildi, ${report.guncellenen} güncellendi, ${report.degismeyen} değişmedi, ${report.reddedilen} reddedildi.`;
         const errors = table("result-errors", ["CSV satırı", "Alan", "Hata nedeni"]);
         report.hatalar.forEach(error => {
             const row = errors.insertRow();
@@ -56,7 +56,7 @@ form.addEventListener("submit", async event => {
         report.urunler.forEach(product => {
             const row = products.insertRow();
             cell(row, product.satir); cell(row, product.gtin);
-            cell(row, product.durum === "kaydedildi" ? "Kaydedildi" : "Değişmedi");
+            cell(row, product.durum === "kaydedildi" ? "Kaydedildi" : product.durum === "guncellendi" ? "Güncellendi" : "Değişmedi");
             const links = cell(row, "");
             links.className = "links";
             // Aynı sunucudaki göreli yollar yerel kullanımda da erişilebilir kalır.

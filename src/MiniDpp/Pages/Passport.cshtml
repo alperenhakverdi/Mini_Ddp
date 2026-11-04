@@ -8,6 +8,8 @@
 <section class="card">
     <dl>
         <dt>GTIN</dt><dd class="gtin">@Model.Passport.Gtin</dd>
+        <dt>Sürüm</dt><dd>@Model.Passport.Version</dd>
+        <dt>Güncellenme (UTC)</dt><dd>@Model.Passport.UpdatedAt.ToUniversalTime().ToString("yyyy-MM-dd HH:mm:ss")</dd>
         <dt>Model</dt><dd>@Model.Passport.ModelName</dd>
         <dt>Batch / lot</dt><dd>@Model.Passport.BatchNumber</dd>
         <dt>Elyaf bileşimi</dt><dd>@Model.Passport.Material</dd>
@@ -19,6 +21,7 @@
     </dl>
 </section>
 <p><a href="@Model.JsonLdPath">JSON-LD çıktısını görüntüle</a></p>
+<p><a href="@Model.HistoryPath">Önceki sürümleri görüntüle</a></p>
 <section class="card qr-card">
     <h2>Ürün pasaportuna erişim</h2>
     <img src="/dpp/@Model.Passport.Gtin/qr.png" width="232" height="232" alt="Bu ürünün pasaport adresine yönlendiren QR kod" />

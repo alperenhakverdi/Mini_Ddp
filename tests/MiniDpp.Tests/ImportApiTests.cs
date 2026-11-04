@@ -53,7 +53,7 @@ public sealed class ImportApiTests
     {
         await using var factory = new DppFactory();
         using var client = factory.CreateClient();
-        using var response = await Upload(client, Header + "\n" + Valid + "\n" + Valid.Replace("12.4", "15") + "\n" + Valid
+        using var response = await Upload(client, Header + "\n" + Valid + "\n" + Valid.Replace("Denizli", "Bursa") + "\n" + Valid
             + "\n08690000000029,Denim,B02,98,2,Bursa,0");
         var report = (await response.Content.ReadFromJsonAsync<ImportReport>())!;
         Assert.Equal(2, report.Kaydedilen);

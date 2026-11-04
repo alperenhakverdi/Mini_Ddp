@@ -38,7 +38,7 @@ public sealed class PersistenceTests
         using var scope = factory.Services.CreateScope();
         var store = scope.ServiceProvider.GetRequiredService<ProductStore>();
         await store.SaveAsync(Sample);
-        await Assert.ThrowsAsync<ProductConflictException>(() => store.SaveAsync(Sample with { CarbonKgCo2e = 1 }));
+        await Assert.ThrowsAsync<ProductConflictException>(() => store.SaveAsync(Sample with { ProductionLocation = "Bursa" }));
         await Assert.ThrowsAsync<ProductConflictException>(() => store.SaveAsync(Sample with
             { Gtin = "08690000000029", CottonPercentage = 97, ElastanePercentage = 3 }));
         await Assert.ThrowsAsync<ProductConflictException>(() => store.SaveAsync(Sample with

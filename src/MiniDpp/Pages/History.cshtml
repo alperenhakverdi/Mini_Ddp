@@ -1,0 +1,31 @@
+@page "/dpp/{gtin}/history"
+@model MiniDpp.Pages.HistoryModel
+@{
+    ViewData["Title"] = "Sürüm geçmişi";
+}
+<h1>Sürüm geçmişi</h1>
+<p class="gtin">@Model.Current.Gtin</p>
+<p><a href="@Model.CurrentPath">Güncel pasaport · Sürüm @Model.Current.Version</a></p>
+@if (Model.History.Count == 0)
+{
+    <p>Bu ürün için henüz önceki sürüm bulunmuyor.</p>
+}
+@foreach (var archived in Model.History)
+{
+    <section class="card">
+        <h2>Sürüm @archived.Data.Version</h2>
+        <dl>
+            <dt>GTIN</dt><dd class="gtin">@archived.Data.Gtin</dd>
+            <dt>Model</dt><dd>@archived.Data.ModelName</dd>
+            <dt>Batch / lot</dt><dd>@archived.Data.BatchNumber</dd>
+            <dt>Elyaf bileşimi</dt><dd>@archived.Data.Material</dd>
+            <dt>Üretim yeri</dt><dd>@archived.Data.ProductionLocation</dd>
+            <dt>Güncellenme (UTC)</dt><dd>@archived.Data.UpdatedAt.ToUniversalTime().ToString("yyyy-MM-dd HH:mm:ss")</dd>
+            <dt>Arşivlenme (UTC)</dt><dd>@archived.ArchivedAt.ToUniversalTime().ToString("yyyy-MM-dd HH:mm:ss")</dd>
+            @if (archived.Data.CarbonKgCo2e is { } carbon)
+            {
+                <dt>Karbon ayak izi</dt><dd>@carbon.ToString(System.Globalization.CultureInfo.InvariantCulture) kg CO2e</dd>
+            }
+        </dl>
+    </section>
+}

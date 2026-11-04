@@ -8,6 +8,7 @@ public sealed class PassportModel(PassportService service) : PageModel
 {
     public PassportData Passport { get; private set; } = default!;
     public string JsonLdPath => $"/dpp/{Passport.Gtin}.jsonld" + (Passport.CarbonKgCo2e.HasValue ? "?rol=yetkili" : "");
+    public string HistoryPath => $"/dpp/{Passport.Gtin}/history" + (Passport.CarbonKgCo2e.HasValue ? "?rol=yetkili" : "");
 
     public async Task<IActionResult> OnGetAsync(string gtin, CancellationToken cancellationToken)
     {

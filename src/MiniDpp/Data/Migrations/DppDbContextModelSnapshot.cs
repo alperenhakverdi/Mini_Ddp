@@ -64,6 +64,12 @@ namespace MiniDpp.Data.Migrations
                     b.Property<DateTimeOffset>("UpdatedAt")
                         .HasColumnType("TEXT");
 
+                    b.Property<int>("Version")
+                        .IsConcurrencyToken()
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER")
+                        .HasDefaultValue(1);
+
                     b.HasKey("Id");
 
                     b.HasIndex("BatchId");
@@ -101,6 +107,60 @@ namespace MiniDpp.Data.Migrations
                     b.ToTable("Models", (string)null);
                 });
 
+            modelBuilder.Entity("MiniDpp.Data.ProductVersion", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<DateTimeOffset>("ArchivedAt")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("BatchNumber")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<decimal>("CarbonKgCo2e")
+                        .HasColumnType("TEXT");
+
+                    b.Property<decimal>("CottonPercentage")
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .HasColumnType("TEXT");
+
+                    b.Property<decimal>("ElastanePercentage")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Gtin")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("ModelName")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("ProductId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("ProductionLocation")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTimeOffset>("UpdatedAt")
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("Version")
+                        .HasColumnType("INTEGER");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ProductId", "Version")
+                        .IsUnique();
+
+                    b.ToTable("ProductVersions");
+                });
+
             modelBuilder.Entity("MiniDpp.Data.Batch", b =>
                 {
                     b.HasOne("MiniDpp.Data.ProductModel", "Model")
@@ -121,6 +181,15 @@ namespace MiniDpp.Data.Migrations
                         .IsRequired();
 
                     b.Navigation("Batch");
+                });
+
+            modelBuilder.Entity("MiniDpp.Data.ProductVersion", b =>
+                {
+                    b.HasOne("MiniDpp.Data.Product", null)
+                        .WithMany()
+                        .HasForeignKey("ProductId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
                 });
 #pragma warning restore 612, 618
         }

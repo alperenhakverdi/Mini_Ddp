@@ -23,7 +23,7 @@ public sealed class PassportTests
             var text = await response.Content.ReadAsStringAsync();
             Assert.DoesNotContain("karbon", text, StringComparison.OrdinalIgnoreCase);
             Assert.DoesNotContain("Carbon", text, StringComparison.OrdinalIgnoreCase);
-            Assert.DoesNotContain("12.4", text);
+            Assert.DoesNotContain("kg CO2e", text);
             Assert.True(response.Headers.CacheControl!.NoStore);
         }
     }
@@ -44,7 +44,7 @@ public sealed class PassportTests
             .Single(property => property.GetProperty("propertyID").GetString() == "karbon_kg_co2e");
         Assert.Equal(12.4m, carbon.GetProperty("value").GetDecimal());
         Assert.Equal("kg CO2e", carbon.GetProperty("unitText").GetString());
-        Assert.DoesNotContain("12.4", await client.GetStringAsync("/dpp/08690000000012"));
+        Assert.DoesNotContain("kg CO2e", await client.GetStringAsync("/dpp/08690000000012"));
     }
 
     [Fact]
@@ -61,7 +61,7 @@ public sealed class PassportTests
         Assert.Equal("https://dpp.example.test/dpp/08690000000012", product.GetProperty("url").GetString());
         Assert.Equal(product.GetProperty("url").GetString(), product.GetProperty("@id").GetString());
         Assert.Equal("Slim Denim 501", product.GetProperty("name").GetString());
-        Assert.Equal(4, product.GetProperty("additionalProperty").GetArrayLength());
+        Assert.Equal(6, product.GetProperty("additionalProperty").GetArrayLength());
     }
 
     [Fact]

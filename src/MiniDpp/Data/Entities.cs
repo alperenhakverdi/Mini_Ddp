@@ -24,6 +24,25 @@ public sealed class Product
     public int BatchId { get; set; }
     public required Batch Batch { get; set; }
     public decimal CarbonKgCo2e { get; set; }
+    public int Version { get; set; } = 1;
     public DateTimeOffset CreatedAt { get; set; }
     public DateTimeOffset UpdatedAt { get; set; }
+}
+
+// İlişkili model/batch daha sonra değişse bile geçmiş kendi değerlerini korur.
+public sealed class ProductVersion
+{
+    public int Id { get; set; }
+    public int ProductId { get; set; }
+    public int Version { get; set; }
+    public required string Gtin { get; set; }
+    public required string ModelName { get; set; }
+    public required string BatchNumber { get; set; }
+    public decimal CottonPercentage { get; set; }
+    public decimal ElastanePercentage { get; set; }
+    public required string ProductionLocation { get; set; }
+    public decimal CarbonKgCo2e { get; set; }
+    public DateTimeOffset CreatedAt { get; set; }
+    public DateTimeOffset UpdatedAt { get; set; }
+    public DateTimeOffset ArchivedAt { get; set; }
 }

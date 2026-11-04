@@ -3,7 +3,7 @@ using MiniDpp.Domain;
 
 namespace MiniDpp.Data;
 
-public enum SaveOutcome { Created, Unchanged }
+public enum SaveOutcome { Created, Updated, Unchanged }
 
 public sealed class ProductConflictException(string field, string message) : Exception(message)
 {
@@ -19,11 +19,7 @@ public sealed class ProductStore(DppDbContext db)
         {
             var existing = await db.Products.Include(product => product.Batch).ThenInclude(batch => batch.Model)
                 .SingleOrDefaultAsync(product => product.Gtin == data.Gtin, cancellationToken);
-            if (existing is not null)
-            {
-                if (ToData(existing) == data) return SaveOutcome.Unchanged;
-                throw new ProductConflictException("gtin", "Bu GTIN farklı ürün bilgileriyle zaten kayıtlıdır.");
-            }
+            if (existing is not null && ToData(existing) == data) return SaveOutcome.Unchanged;
 
             var model = await db.Models.SingleOrDefaultAsync(model => model.Name == data.ModelName, cancellationToken);
             if (model is not null && (model.CottonPercentage != data.CottonPercentage
@@ -42,14 +38,33 @@ public sealed class ProductStore(DppDbContext db)
 
             batch ??= new Batch { Model = model, Number = data.BatchNumber, ProductionLocation = data.ProductionLocation };
             var now = DateTimeOffset.UtcNow;
-            db.Products.Add(new Product
+            if (existing is null)
             {
-                Gtin = data.Gtin, Batch = batch, CarbonKgCo2e = data.CarbonKgCo2e,
-                CreatedAt = now, UpdatedAt = now
-            });
+                db.Products.Add(new Product
+                {
+                    Gtin = data.Gtin, Batch = batch, CarbonKgCo2e = data.CarbonKgCo2e,
+                    Version = 1, CreatedAt = now, UpdatedAt = now
+                });
+            }
+            else
+            {
+                db.ProductVersions.Add(new ProductVersion
+                {
+                    ProductId = existing.Id, Version = existing.Version, Gtin = existing.Gtin,
+                    ModelName = existing.Batch.Model.Name, BatchNumber = existing.Batch.Number,
+                    CottonPercentage = existing.Batch.Model.CottonPercentage,
+                    ElastanePercentage = existing.Batch.Model.ElastanePercentage,
+                    ProductionLocation = existing.Batch.ProductionLocation, CarbonKgCo2e = existing.CarbonKgCo2e,
+                    CreatedAt = existing.CreatedAt, UpdatedAt = existing.UpdatedAt, ArchivedAt = now
+                });
+                existing.Batch = batch;
+                existing.CarbonKgCo2e = data.CarbonKgCo2e;
+                existing.Version = checked(existing.Version + 1);
+                existing.UpdatedAt = now;
+            }
             await db.SaveChangesAsync(cancellationToken);
             await transaction.CommitAsync(cancellationToken);
-            return SaveOutcome.Created;
+            return existing is null ? SaveOutcome.Created : SaveOutcome.Updated;
         }
         finally
         {

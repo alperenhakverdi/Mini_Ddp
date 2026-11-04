@@ -7,6 +7,7 @@ public sealed class DppDbContext(DbContextOptions<DppDbContext> options) : DbCon
     public DbSet<ProductModel> Models => Set<ProductModel>();
     public DbSet<Batch> Batches => Set<Batch>();
     public DbSet<Product> Products => Set<Product>();
+    public DbSet<ProductVersion> ProductVersions => Set<ProductVersion>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -28,10 +29,18 @@ public sealed class DppDbContext(DbContextOptions<DppDbContext> options) : DbCon
         {
             entity.Property(product => product.Gtin).HasColumnType("TEXT").IsRequired();
             entity.HasIndex(product => product.Gtin).IsUnique();
+            entity.Property(product => product.Version).HasDefaultValue(1).IsConcurrencyToken();
             entity.HasOne(product => product.Batch).WithMany().HasForeignKey(product => product.BatchId)
                 .OnDelete(DeleteBehavior.Restrict);
             entity.ToTable("Products", table => table.HasCheckConstraint("CK_Products_Gtin",
                 "length(Gtin) = 14 AND Gtin NOT GLOB '*[^0-9]*'"));
+        });
+        modelBuilder.Entity<ProductVersion>(entity =>
+        {
+            entity.Property(version => version.Gtin).HasColumnType("TEXT").IsRequired();
+            entity.HasIndex(version => new { version.ProductId, version.Version }).IsUnique();
+            entity.HasOne<Product>().WithMany().HasForeignKey(version => version.ProductId)
+                .OnDelete(DeleteBehavior.Restrict);
         });
     }
 }

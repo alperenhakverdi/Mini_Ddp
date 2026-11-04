@@ -1,0 +1,26 @@
+# Derleme ve test çıktıları
+**/bin/
+**/obj/
+TestResults/
+coverage/
+
+# Yerel geliştirme dosyaları
+.vs/
+*.user
+*.suo
+.env
+.env.*
+!.env.example
+
+# Yerel veritabanları
+*.db
+*.db-shm
+*.db-wal
+*.sqlite
+*.sqlite-shm
+*.sqlite-wal
+*.sqlite3
+
+# Olası ön yüz bağımlılıkları
+node_modules/
+dist/

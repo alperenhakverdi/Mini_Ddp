@@ -1,6 +1,48 @@
 @page
+@model MiniDpp.Pages.IndexModel
 @{
     ViewData["Title"] = "Ürünler";
 }
 <h1>Denim ürün pasaportları</h1>
 <p>Ürün bilgilerini CSV dosyasından yükleyerek dijital ürün pasaportları oluşturun.</p>
+<section class="card" aria-labelledby="import-title">
+    <h2 id="import-title">CSV içe aktar</h2>
+    <p>UTF-8, virgülle ayrılmış CSV · En fazla 5 MiB. Hatalı satırlar kaydedilmez; geçerli satırlar işlenir.</p>
+    <form id="import-form" action="/api/imports" method="post" enctype="multipart/form-data">
+        <label for="csv-file">CSV dosyası</label>
+        <input id="csv-file" name="file" type="file" accept=".csv,text/csv" required />
+        <button id="import-button" type="submit">Dosyayı içe aktar</button>
+    </form>
+    <p id="import-status" role="status" aria-live="polite"></p>
+    <noscript><p>Sonuçları bu ekranda görmek için JavaScript etkin olmalıdır. Form gönderildiğinde API'nin JSON sonucu da görüntülenebilir.</p></noscript>
+</section>
+<section id="import-result" class="card" aria-labelledby="result-title" hidden>
+    <h2 id="result-title">İçe aktarma sonucu</h2>
+    <p id="result-summary"></p>
+    <div id="result-errors"></div>
+    <div id="result-products"></div>
+</section>
+<section class="card" aria-labelledby="products-title">
+    <h2 id="products-title">Kayıtlı ürünler <span class="count">@Model.Products.Count</span></h2>
+    @if (Model.Products.Count == 0)
+    {
+        <p>Henüz ürün kaydı bulunmuyor. İlk pasaportları oluşturmak için CSV dosyası yükleyin.</p>
+    }
+    else
+    {
+        <div class="table-wrap"><table>
+            <thead><tr><th>GTIN</th><th>Model</th><th>Batch / lot</th><th>Çıktılar</th></tr></thead>
+            <tbody>
+            @foreach (var product in Model.Products)
+            {
+                <tr>
+                    <td class="gtin">@product.Gtin</td><td>@product.ModelName</td><td>@product.BatchNumber</td>
+                    <td class="links"><a href="/dpp/@product.Gtin">HTML</a><a href="/dpp/@(product.Gtin).jsonld">JSON-LD</a><a href="/dpp/@product.Gtin/qr.png" download="@(product.Gtin).png">QR PNG</a></td>
+                </tr>
+            }
+            </tbody>
+        </table></div>
+    }
+    <p><a href="/">Ürün listesini yenile</a></p>
+</section>
+<script src="~/import.js" defer></script>

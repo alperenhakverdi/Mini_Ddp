@@ -2,8 +2,21 @@ namespace MiniDpp.Passports;
 
 public static class PassportEndpoints
 {
-    public static void MapPassportEndpoints(this WebApplication app) =>
+    public static void MapPassportEndpoints(this WebApplication app)
+    {
         app.MapGet("/dpp/{gtin}.jsonld", JsonLdAsync);
+        app.MapGet("/dpp/{gtin}/qr.png", QrAsync);
+    }
+
+    private static async Task<IResult> QrAsync(string gtin, PassportService service, DppLinks links,
+        CancellationToken cancellationToken)
+    {
+        if (await service.FindAsync(gtin, false, cancellationToken) is null) return Results.NotFound();
+        using var generator = new QRCoder.QRCodeGenerator();
+        using var data = generator.CreateQrCode(links.Html(gtin), QRCoder.QRCodeGenerator.ECCLevel.M);
+        using var png = new QRCoder.PngByteQRCode(data);
+        return Results.File(png.GetGraphic(8), "image/png");
+    }
 
     private static async Task<IResult> JsonLdAsync(string gtin, HttpContext context,
         PassportService service, DppLinks links, CancellationToken cancellationToken)

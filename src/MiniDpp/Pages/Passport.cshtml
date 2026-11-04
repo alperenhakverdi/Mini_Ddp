@@ -19,3 +19,8 @@
     </dl>
 </section>
 <p><a href="@Model.JsonLdPath">JSON-LD çıktısını görüntüle</a></p>
+<section class="card qr-card">
+    <h2>Ürün pasaportuna erişim</h2>
+    <img src="/dpp/@Model.Passport.Gtin/qr.png" width="232" height="232" alt="Bu ürünün pasaport adresine yönlendiren QR kod" />
+    <p><a href="/dpp/@Model.Passport.Gtin/qr.png" download="@(Model.Passport.Gtin).png">QR kodu PNG olarak indir</a></p>
+</section>

@@ -3,6 +3,9 @@ using MiniDpp.Data;
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
+using Microsoft.AspNetCore.Http.Features;
+using MiniDpp.Importing;
+using MiniDpp.Passports;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddRazorPages();
@@ -26,6 +29,11 @@ builder.Services.AddDbContext<DppDbContext>((services, options) =>
     }.ToString());
 });
 builder.Services.AddScoped<ProductStore>();
+builder.Services.AddSingleton<CsvProductReader>();
+builder.Services.AddSingleton<DppLinks>();
+builder.Services.AddScoped<ImportService>();
+builder.Services.Configure<FormOptions>(options => options.MultipartBodyLengthLimit = ImportEndpoints.MaxFileBytes);
+builder.WebHost.ConfigureKestrel(options => options.Limits.MaxRequestBodySize = ImportEndpoints.MaxRequestBytes);
 
 var app = builder.Build();
 using (var scope = app.Services.CreateScope())
@@ -35,6 +43,7 @@ using (var scope = app.Services.CreateScope())
 app.UseExceptionHandler();
 app.UseStaticFiles();
 app.MapRazorPages();
+app.MapImportEndpoints();
 app.Run();
 
 public partial class Program;

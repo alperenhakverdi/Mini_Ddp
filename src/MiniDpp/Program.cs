@@ -32,6 +32,7 @@ builder.Services.AddScoped<ProductStore>();
 builder.Services.AddSingleton<CsvProductReader>();
 builder.Services.AddSingleton<DppLinks>();
 builder.Services.AddScoped<ImportService>();
+builder.Services.AddScoped<PassportService>();
 builder.Services.Configure<FormOptions>(options => options.MultipartBodyLengthLimit = ImportEndpoints.MaxFileBytes);
 builder.WebHost.ConfigureKestrel(options => options.Limits.MaxRequestBodySize = ImportEndpoints.MaxRequestBytes);
 
@@ -44,6 +45,7 @@ app.UseExceptionHandler();
 app.UseStaticFiles();
 app.MapRazorPages();
 app.MapImportEndpoints();
+app.MapPassportEndpoints();
 app.Run();
 
 public partial class Program;

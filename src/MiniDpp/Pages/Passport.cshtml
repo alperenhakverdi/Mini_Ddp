@@ -1,0 +1,21 @@
+@page "/dpp/{gtin}"
+@model MiniDpp.Pages.PassportModel
+@{
+    ViewData["Title"] = Model.Passport.ModelName;
+}
+<p class="eyebrow">Dijital Ürün Pasaportu</p>
+<h1>@Model.Passport.ModelName</h1>
+<section class="card">
+    <dl>
+        <dt>GTIN</dt><dd class="gtin">@Model.Passport.Gtin</dd>
+        <dt>Model</dt><dd>@Model.Passport.ModelName</dd>
+        <dt>Batch / lot</dt><dd>@Model.Passport.BatchNumber</dd>
+        <dt>Elyaf bileşimi</dt><dd>@Model.Passport.Material</dd>
+        <dt>Üretim yeri</dt><dd>@Model.Passport.ProductionLocation</dd>
+        @if (Model.Passport.CarbonKgCo2e is { } carbon)
+        {
+            <dt>Karbon ayak izi</dt><dd>@carbon.ToString(System.Globalization.CultureInfo.InvariantCulture) kg CO2e</dd>
+        }
+    </dl>
+</section>
+<p><a href="@Model.JsonLdPath">JSON-LD çıktısını görüntüle</a></p>

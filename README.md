@@ -34,7 +34,7 @@
 
 ## Proje Hakkında
 
-Mini DPP, ESG Next işe alım değerlendirmesi için hazırlanmış bir ASP.NET Core 10 uygulamasıdır. Türkçe Razor Pages arayüzü ve SQLite kullanır.
+Mini DPP, denim ürünlerinin verilerini CSV'den doğrulayarak dijital ürün pasaportlarına dönüştüren bir uygulamadır. Ürün bilgilerini saklar, farklı biçimlerde paylaşır ve güncellemelerin geçmişini korur. ASP.NET Core 10, Razor Pages ve SQLite kullanır.
 
 | Özellik | Açıklama |
 |---|---|

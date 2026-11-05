@@ -6,6 +6,7 @@ coverage/
 
 # Yerel geliştirme dosyaları
 .vs/
+/YOL_HARITASI.md
 *.user
 *.suo
 .env

@@ -1,0 +1,16 @@
+.git
+.vs
+**/bin
+**/obj
+**/App_Data
+**/node_modules
+TestResults
+coverage
+.env
+.env.*
+**/*.db
+**/*.db-shm
+**/*.db-wal
+**/*.sqlite
+**/*.sqlite3
+YOL_HARITASI.md

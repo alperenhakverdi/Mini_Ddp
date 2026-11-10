@@ -171,6 +171,4 @@ Testler ayrı geçici veritabanları kullanır; uygulamadaki ürünleri değişt
 
 ---
 
-README düzeni [Best-README-Template](https://github.com/othneildrew/Best-README-Template) yaklaşımından esinlenilmiştir.
-
 <p align="right"><a href="#readme-top">Başa dön ↑</a></p>

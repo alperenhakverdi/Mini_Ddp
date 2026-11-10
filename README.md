@@ -23,6 +23,7 @@
 - [Kurulum](#getting-started)
 - [Kullanım](#usage)
 - [Örnek Adresler](#examples)
+- [Swagger ile API Deneme](#swagger)
 - [Geliştirme ve Test](#development)
 - [Tasarım Notları](#design)
 
@@ -111,6 +112,7 @@ CSV yüklendikten sonra aşağıdaki adresleri kullanabilirsiniz:
 | QR PNG | [QR kodu aç](http://localhost:5000/dpp/08690000000012/qr.png) |
 | Sürüm geçmişi | [Önceki kayıtlar](http://localhost:5000/dpp/08690000000012/history) |
 | Yetkili görünüm | [Karbon değerini göster](http://localhost:5000/dpp/08690000000012?rol=yetkili) |
+| Swagger UI | [API dokümanı ve deneme ekranı](http://localhost:5000/swagger) |
 
 Karbon varsayılan HTML, JSON-LD ve geçmiş çıktılarında bulunmaz. İlgili adrese `?rol=yetkili` eklenince gösterilir. Bu parametre **demo görünürlüğüdür; kimlik doğrulama değildir**.
 
@@ -123,6 +125,20 @@ DPP_PUBLIC_BASE_URL=http://192.168.1.50:5000
 ```
 
 Ardından `docker compose up -d` çalıştırın. Telefon bu adrese erişebilmelidir; `localhost` telefondan bilgisayarınıza yönlendirmez.
+
+<a id="swagger"></a>
+
+## Swagger ile API Deneme
+
+Uygulama çalışırken **[http://localhost:5000/swagger](http://localhost:5000/swagger)** adresini açın. Ana sayfadaki **API / Swagger** bağlantısını da kullanabilirsiniz. Yerel çalıştırma ve Docker demo ortamında açıktır.
+
+1. `POST /api/imports` işlemini açıp **Try it out** düğmesine basın.
+2. `file` alanından örnek CSV'yi seçip **Execute** ile gönderin. **Response body** içinde kayıt sayılarını ve satır hatalarını inceleyin.
+3. JSON-LD veya QR endpoint'ini açıp `gtin` alanına `08690000000012` yazın ve çalıştırın. JSON-LD'de `rol` değerini `yetkili` yaparak karbon görünümünü deneyebilirsiniz.
+
+Swagger gerçek API'ye istek gönderir; CSV yüklemek ürün oluşturabilir veya güncelleyebilir. HTML ve sürüm geçmişi sayfalarına yukarıdaki örnek adreslerden erişilir.
+
+Postman zorunlu değildir. Kullanmak isterseniz **Import** bölümünden `http://localhost:5000/openapi/v1.json` adresindeki OpenAPI dokümanını içe aktarabilirsiniz. Örnek HTTP istekleri ayrıca [MiniDpp.http](./MiniDpp.http) dosyasındadır.
 
 <a id="development"></a>
 

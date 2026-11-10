@@ -1,0 +1,37 @@
+@baseUrl = http://localhost:5000
+@gtin = 08690000000012
+
+### Swagger ekranı
+GET {{baseUrl}}/swagger
+
+### OpenAPI dokümanı (Postman'e de içe aktarılabilir)
+GET {{baseUrl}}/openapi/v1.json
+
+### Örnek CSV yükle (gerçek kayıt oluşturur veya günceller)
+POST {{baseUrl}}/api/imports
+Content-Type: multipart/form-data; boundary=MiniDppBoundary
+
+--MiniDppBoundary
+Content-Disposition: form-data; name="file"; filename="urunler_duzeltilmis_test.csv"
+Content-Type: text/csv
+
+< ./urunler_duzeltilmis_test.csv
+--MiniDppBoundary--
+
+### Tüketici JSON-LD
+GET {{baseUrl}}/dpp/{{gtin}}.jsonld
+
+### Yetkili JSON-LD
+GET {{baseUrl}}/dpp/{{gtin}}.jsonld?rol=yetkili
+
+### PNG QR
+GET {{baseUrl}}/dpp/{{gtin}}/qr.png
+
+### HTML pasaportu
+GET {{baseUrl}}/dpp/{{gtin}}
+
+### Sürüm geçmişi
+GET {{baseUrl}}/dpp/{{gtin}}/history
+
+### Bulunamayan ürün: 404
+GET {{baseUrl}}/dpp/00000000000000.jsonld

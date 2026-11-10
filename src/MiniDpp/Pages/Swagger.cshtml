@@ -1,0 +1,23 @@
+@page "/swagger"
+@{
+    Layout = null;
+}
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Mini DPP · Swagger UI</title>
+    <link rel="stylesheet" href="~/swagger-ui/swagger-ui.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/swagger-page.css" asp-append-version="true" />
+</head>
+<body>
+    <nav aria-label="Dokümantasyon bağlantıları">
+        <a href="/">← Ürünler ve CSV yükleme</a>
+        <a href="/openapi/v1.json">OpenAPI JSON</a>
+    </nav>
+    <div id="swagger-ui"></div>
+    <script src="~/swagger-ui/swagger-ui-bundle.js" asp-append-version="true"></script>
+    <script src="~/swagger-init.js" asp-append-version="true"></script>
+</body>
+</html>

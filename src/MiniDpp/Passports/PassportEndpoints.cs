@@ -4,8 +4,21 @@ public static class PassportEndpoints
 {
     public static void MapPassportEndpoints(this WebApplication app)
     {
-        app.MapGet("/dpp/{gtin}.jsonld", JsonLdAsync);
-        app.MapGet("/dpp/{gtin}/qr.png", QrAsync);
+        app.MapGet("/dpp/{gtin}.jsonld", JsonLdAsync)
+            .WithName("GetProductJsonLd")
+            .WithTags("Ürün pasaportu")
+            .WithSummary("Ürünün JSON-LD pasaportunu getir")
+            .WithDescription("schema.org/Product çıktısı döndürür. GTIN metin olarak korunur. "
+                + "Karbon yalnızca rol=yetkili ile eklenir. Ürün bulunamazsa 404 döner.")
+            .Produces<Dictionary<string, object>>(contentType: "application/ld+json")
+            .Produces(StatusCodes.Status404NotFound);
+        app.MapGet("/dpp/{gtin}/qr.png", QrAsync)
+            .WithName("GetProductQr")
+            .WithTags("Ürün pasaportu")
+            .WithSummary("HTML pasaportuna yönlendiren QR kodunu getir")
+            .WithDescription("PNG görüntüsü döndürür. QR her zaman tüketici HTML adresini içerir. Ürün bulunamazsa 404 döner.")
+            .Produces<byte[]>(contentType: "image/png")
+            .Produces(StatusCodes.Status404NotFound);
     }
 
     private static async Task<IResult> QrAsync(string gtin, PassportService service, DppLinks links,

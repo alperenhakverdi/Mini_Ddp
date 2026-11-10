@@ -6,7 +6,17 @@ public static class ImportEndpoints
     public const long MaxRequestBytes = MaxFileBytes + 64 * 1024;
 
     public static void MapImportEndpoints(this WebApplication app) =>
-        app.MapPost("/api/imports", ImportAsync);
+        app.MapPost("/api/imports", ImportAsync)
+            .WithName("ImportProducts")
+            .WithTags("CSV içe aktarma")
+            .WithSummary("CSV dosyasını doğrula ve ürünleri kaydet")
+            .WithDescription("multipart/form-data içindeki file alanında UTF-8 CSV gönderin (en fazla 5 MiB). "
+                + "Hatalı satırlar kaydedilmez, geçerli satırlar işlenir. Aynı GTIN ve aynı veride değişiklik yapılmaz; "
+                + "farklı geçerli veri ürünü günceller ve önceki sürümü saklar. HTTP 200 yanıtında da hatalar bulunabilir; "
+                + "reddedilen, hatalar ve tamamlandi alanlarını kontrol edin. Başlık hatasında 400, boyut aşımında 413 döner.")
+            .Produces<ImportReport>()
+            .Produces(StatusCodes.Status400BadRequest)
+            .ProducesProblem(StatusCodes.Status413PayloadTooLarge);
 
     private static async Task<IResult> ImportAsync(HttpRequest request, ImportService service, CancellationToken cancellationToken)
     {

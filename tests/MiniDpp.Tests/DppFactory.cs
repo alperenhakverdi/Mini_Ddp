@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
+using Microsoft.Extensions.Logging;
 
 namespace MiniDpp.Tests;
 
@@ -10,6 +11,8 @@ public sealed class DppFactory : WebApplicationFactory<Program>
 
     protected override void ConfigureWebHost(IWebHostBuilder builder)
     {
+        // Testler Windows Event Log'a yazma yetkisi gerektirmemeli.
+        builder.ConfigureLogging(logging => logging.ClearProviders().AddConsole());
         builder.UseSetting("Dpp:DatabasePath", DatabasePath);
         builder.UseSetting("Dpp:PublicBaseUrl", "https://dpp.example.test");
         builder.UseSetting("Logging:LogLevel:Default", "Warning");

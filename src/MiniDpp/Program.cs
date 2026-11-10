@@ -6,10 +6,12 @@ using Microsoft.Extensions.Options;
 using Microsoft.AspNetCore.Http.Features;
 using MiniDpp.Importing;
 using MiniDpp.Passports;
+using MiniDpp.Documentation;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddRazorPages();
 builder.Services.AddProblemDetails();
+builder.Services.AddApiDocumentation();
 builder.Services.AddOptions<DppOptions>()
     .BindConfiguration("Dpp")
     .Validate(options => Uri.TryCreate(options.PublicBaseUrl, UriKind.Absolute, out var uri)
@@ -46,6 +48,8 @@ app.UseStaticFiles();
 app.MapRazorPages();
 app.MapImportEndpoints();
 app.MapPassportEndpoints();
+// Bu demo uygulamasında dokümanlar yerel çalıştırma ve Docker için açıktır.
+app.MapOpenApi().ExcludeFromDescription();
 app.Run();
 
 public partial class Program;

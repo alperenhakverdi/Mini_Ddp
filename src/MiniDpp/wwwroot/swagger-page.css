@@ -1,0 +1,6 @@
+body { margin: 0; background: #fafafa; }
+nav { display: flex; flex-wrap: wrap; gap: 20px; padding: 18px 30px; background: #163047; font: 15px system-ui, sans-serif; }
+nav a { color: white; text-decoration: none; }
+nav a:hover { text-decoration: underline; }
+nav a:focus-visible { outline: 3px solid #d68b13; outline-offset: 4px; }
+.swagger-ui .info { margin: 32px 0; }
